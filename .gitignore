@@ -1,0 +1,16 @@
+/.idea/.gitignore
+/kms-redshift-dms/.idea/.gitignore
+/.idea/aws.xml
+/kms-redshift-dms/.idea/aws.xml
+/kms-redshift-dms/.idea/dataSources.xml
+/.idea/dms-cdk-samples.iml
+/.idea/misc.xml
+/kms-redshift-dms/.idea/misc.xml
+/.idea/modules.xml
+/kms-redshift-dms/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/kms-redshift-dms/.idea/inspectionProfiles/profiles_settings.xml
+/kms-redshift-dms/.idea/sqldialects.xml
+/kms-redshift-dms/.idea/TestS3Shared.iml
+/.idea/vcs.xml
+/kms-redshift-dms/.idea/vcs.xml
