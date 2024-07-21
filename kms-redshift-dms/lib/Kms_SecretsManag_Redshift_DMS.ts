@@ -8,6 +8,7 @@ import * as dms from 'aws-cdk-lib/aws-dms';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import {CfnOutput, SecretValue} from "aws-cdk-lib";
 import { hashValue } from './utils';
+import {CfnEndpoint, CfnReplicationInstance} from "aws-cdk-lib/aws-dms";
 
 export class KmsSecretsmanagerRedshiftDMStack extends cdk.Stack {
   public readonly cluster: redshift.CfnCluster;
@@ -133,8 +134,10 @@ export class KmsSecretsmanagerRedshiftDMStack extends cdk.Stack {
     });
     dmsReplicationSubnetGroup.node.addDependency(vpc);
 
+    const dmsEndpointRIName = 'KmsSecretsmanagerRedshiftDMStack-RI'
     const dmsReplicationInstance = new dms.CfnReplicationInstance(this, 'DMSReplicationInstance', {
-      replicationInstanceClass: 'dms.c5.4xlarge',
+      replicationInstanceIdentifier: dmsEndpointRIName,
+      replicationInstanceClass: 'dms.c5.large',
       allocatedStorage: 50,
       engineVersion: '3.5.3',
       kmsKeyId: kmsKey.keyArn,
@@ -172,6 +175,7 @@ export class KmsSecretsmanagerRedshiftDMStack extends cdk.Stack {
     });
 
     const cluster = new redshift.CfnCluster(this, 'RedshiftCluster', {
+      clusterIdentifier: 'KmsSecretsmanagerRedshiftDMStack-Cluster',
       clusterType: 'multi-node',
       dbName: 'dev',
       masterUsername: RedshiftSecret.secretValueFromJson('username').unsafeUnwrap(),
@@ -199,7 +203,9 @@ export class KmsSecretsmanagerRedshiftDMStack extends cdk.Stack {
     },
   });
 
+    const dmsEndpointName = 'KmsSecretsmanagerRedshiftDMStack-Endpoint'
     const dmsEndpoint = new dms.CfnEndpoint(this, 'DMSEndpoint', {
+      endpointIdentifier: dmsEndpointName,
       endpointType: 'target',
       engineName: 'redshift',
       databaseName: 'dev',
@@ -218,6 +224,26 @@ export class KmsSecretsmanagerRedshiftDMStack extends cdk.Stack {
     dmsEndpoint.node.addDependency(cluster);
     dmsEndpoint.node.addDependency(dmsEndpointRole);
     dmsEndpoint.node.addDependency(RedshiftDmsEndpointSecret);
+
+  // CloudFormation Outputs
+  new cdk.CfnOutput(this, 'ReplicationInstanceName', {
+    value: dmsEndpointRIName,
+    description: 'The name of the DMS Replication Instance',
+    exportName: 'ReplicationInstanceName',
+  });
+
+  new cdk.CfnOutput(this, 'EndpointName', {
+    value: dmsEndpointName,
+    description: 'The name of the DMS Endpoint',
+    exportName: 'EndpointName',
+  });
+
+  new cdk.CfnOutput(this, 'BucketARN', {
+  value: `https://us-east-1.console.aws.amazon.com/s3/home?region=us-east-1&bucket=${dmsBucket.bucketName}`,
+  description: 'The name of the S3 bucket',
+  exportName: 'BucketARN',
+  });
+
 
   }
 }

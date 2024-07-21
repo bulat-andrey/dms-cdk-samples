@@ -7,4 +7,9 @@ import * as cdk from "aws-cdk-lib";
 const app = new App();
 const producer = new Producer(app, 'Producer');
 new Consumer(app, 'Consumer', { userBucket: producer.myBucket });
-new KmsSecretsmanagerRedshiftDMStack(app, 'KmsSecretsmanagerRedshiftDMStack');
+new KmsSecretsmanagerRedshiftDMStack(app, 'KmsSecretsmanagerRedshiftDMStack', {
+    description: 'Test of KMS SecretsManager+Redshift with DMS Endpoint w/ Secret and private DMS RI',
+    tags: {
+    creator: 'Bulatov'
+  }
+});
